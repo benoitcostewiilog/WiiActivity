@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ActiviteRepository")
@@ -18,34 +19,39 @@ class Activite
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"activite"})
      */
     private $date;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"activite"})
      */
     private $temps;
-
     
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"activite"})
      */
     private $tache;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Utilisateur", inversedBy="activites")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"activite"})
      */
     private $utilisateur;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Projet", inversedBy="activites")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"activite"})
      */
     private $projet;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Site", inversedBy="activite")
+     * @Groups({"activite"})
      */
     private $site;
 

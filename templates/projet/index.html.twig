@@ -6,7 +6,7 @@
 
 <h2>Projet</h2>
 
-<a href="{{ path('projet_new') }}" class='button'>Créer nouveau projet</a>
+<a href="{{ path('projet_new') }}" class='button pull-right'><i class="fas fa-plus"></i> Créer nouveau projet</a>
     <table id="grid-data" class="table table-condensed table-hover table-striped">
         <thead >
             <tr>
@@ -42,7 +42,7 @@
 <script>
         var grid = $("#grid-data").bootgrid({
             rowCount: [
-                5 ,10  , -1
+                10 , 25, 50, -1
             ],
             ajax: false,
             

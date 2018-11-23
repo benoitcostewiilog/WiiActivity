@@ -19,6 +19,17 @@ class ActiviteRepository extends ServiceEntityRepository
         parent::__construct($registry, Activite::class);
     }
 
+    public function findBySearch($value)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.tache like :val')
+            ->setParameter('val', '%' . $value . '%')
+            ->orderBy('r.tache', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function compte()
     {
         return $this->createQueryBuilder('a')
