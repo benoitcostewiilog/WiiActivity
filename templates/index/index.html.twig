@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Activité!{% endblock %}
+
+{% block body %}
+
+
+
+<form action="" class='row backgrey filter-wrapper'>
+    <div class="input-group daterange">
+        <div class="input-group-addon">De</div>
+        <input type="text" id='datedebut'  class='form-control' placeholder="date début">
+        <div class="input-group-addon">à</div>
+        <input type="text" id='datefin' class='form-control' placeholder='date fin'>
+    </div>
+    <select type="text" id='site' class="form-control basic-multiple-etat"  multiple="multiple">
+        
+        {% for site in sites %}
+            <option value={{site.name}}>{{site.name}}</option>
+        {% endfor %}
+    </select>
+    <select type="text" id='utilisateur' class="form-control basic-multiple-etat"  multiple="multiple">
+        {% for utilisateur in utilisateurs %}
+            <option value={{utilisateur.nom}}>{{utilisateur.nom}}</option>
+        {% endfor %}
+    </select>
+    <select type="text" id='projet' class="form-control basic-multiple-etat" multiple="multiple">
+        {% for projet in projets %}
+            <option value={{projet.name}}>{{projet.name}}</option>
+        {% endfor %}
+    </select>
+    <button id='filter' class='button'>filtre</button>
+</form>
+<div class='btn-bar'>
+    <a class='button ' href={{path('activite_new')}}>ajouter une activité</a>
+</div>
+
+    <table id="grid-data" class="table table-condensed table-hover table-striped">
+        <thead>
+            <tr>
+                <th data-column-id="id" data-visible="false" data-sortable="false">Id</th>
+                <th data-column-id="date">Date</th>
+                <th data-column-id="temps">temps</th>
+                <th data-column-id="site">site/client</th>
+                <th data-column-id="projet">projet</th>
+                <th data-column-id="tache">tache</th>
+                <th data-column-id="avancement" data-sortable="false">avancement</th>
+                <th data-column-id="progression" data-formatter="progression" data-sortable="false">progression</th>
+                <th data-column-id="commands" data-formatter="commands" data-sortable="false">action</th>
+            </tr>
+        </thead>
+    </table>
+
+{% endblock %}
+{% block javascripts %}
+<script >
+   
+    $('#datedebut, #datefin').datepicker({language: 'fr', format: 'dd/mm/yyyy', todayBtn: true, todayHighlight: true, autoclose: true});
+   
+    let projet= [];
+    $('#projet').on('select2:select', function (e) {
+        $.each($(this).select2('data'), function(i){
+            projet[i] = $(this)[0].text;
+        })
+      });
+
+    let utilisateur= [];
+    $('#utilisateur').on('select2:select', function (e) {
+        $.each($(this).select2('data'), function(i){
+            utilisateur[i] = $(this)[0].text;
+        })
+    });
+
+    let site= [];
+    $('#site').on('select2:select', function (e) {
+        $.each($(this).select2('data'), function(i){
+            site[i] = $(this)[0].text;
+        })
+      });
+    
+      let start = 0;
+
+      $('#site').select2({placeholder: 'site'});
+      $('#utilisateur').select2({placeholder: 'utilisateur'});
+      $('#projet').select2({placeholder: 'projet'});
+
+    
+    var grid = $("#grid-data").bootgrid({
+        rowCount: [
+            10 ,25 ,50  , -1
+        ],
+        ajax: true,
+        requestHandler: function (request) {
+            request.start = start;
+            request.site = site;
+            request.projet = projet;
+            request.utilisateur = utilisateur;
+            request.datedebut = $('#datedebut').val();
+            request.datefin = $('#datefin').val();
+            return request;
+        },
+        url: "{{ path('index') }}",
+        formatters: {
+            "commands": function (column, row) {
+                return "<button type=\"button\" class=\"btn btn-xs btn-default command-view\" data-row-id=\"" + row.id + "\"><span class=\"fas fa-pencil-alt\"></span></button> ";
+            },
+            "progression": function (column, row) {
+                return "<div class='progress'><div class='progress-bar' role='progressbar' style='width: "+ row.progression+"%' aria-valuemax='100'></div></div>";
+            },
+        }
+
+    }).on("loaded.rs.jquery.bootgrid", function () {
+        /* Executes after data is loaded and rendered */
+        grid.find(".command-view, .etiquette").on("click", function (e) {
+            var url = "{{ path('activite_edit', {'id': 'edit_id'}) }}";
+            var id = $(this).attr("data-row-id");
+            url = url.replace("edit_id", id);
+            window.location.href = url;
+          
+        })
+    });
+
+    $("#filter").on("click", function (e) {
+        start = 1;
+        e.preventDefault();
+        $("#grid-data").bootgrid('reload');
+    });
+</script>
+
+{% endblock %}

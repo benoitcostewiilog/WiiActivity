@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Activite{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Activité</h1>
+
+        {{ include('activite/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+
+        <div class="supRe">
+            <a href="{{ path('index') }}" class='button'>Retour</a>
+
+            {{ include('activite/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+<script >
+    $('#activite_date').datepicker({language: 'fr', format: 'dd/mm/yyyy', todayBtn: true, todayHighlight: true, autoclose: true});
+</script>
+{% endblock %}

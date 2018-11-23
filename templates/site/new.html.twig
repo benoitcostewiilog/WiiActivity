@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Site/Client{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Créer un nouveau Site/Client</h1>
+
+    {{ include('site/_form.html.twig') }}
+    <div class="supRe">
+        <a class='button btn-bar' href="{{ path('index') }}">Retour</a>
+    </div>
+</div>
+{% endblock %}

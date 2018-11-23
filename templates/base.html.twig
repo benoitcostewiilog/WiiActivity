@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang='fr'>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}">
+        <title>{% block title %}Erreur{% endblock %}</title>
+        <link rel="stylesheet" href={{asset("css/reset.css")}}>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+        <link rel="stylesheet" href={{asset("css/jquery.bootgrid.css")}}>
+        <link rel="stylesheet" href={{asset("css/select2.css")}}>
+        <link rel="stylesheet" href={{asset("css/bootstrap-datepicker.css")}}>
+        <link rel="stylesheet" type="text/css" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+        
+        <link rel="stylesheet" href={{asset("css/style.css")}}>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body >
+        <nav>
+            <ul  id="sidemenu" class="sidemenu">
+                <li>                           
+                    <a>
+                         <div class="username">{{ app.user.username }}</div>                    
+                        <i class="far fa-user-circle fa-4x"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href={{ path('index')}}>                               
+                        <i class="far fa-calendar-alt fa-4x"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href={{ path('projet_index')}}>
+                        <i class="fas fa-project-diagram fa-4x"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href={{ path('site_index')}}>
+                        <i class="fas fa-map-marked fa-4x"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href={{ path('logout')}}>                            
+                        <i class="fas fa-power-off fa-4x"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="wrapper">
+            {% block body %}{% endblock %}
+        </div>
+        <script src={{asset("js/jquery.min.js")}}></script>
+        <script src={{asset("bootstrap/js/bootstrap.min.js")}}></script>
+        <script src={{asset("js/jquery.bootgrid.js")}}></script>
+        <script src={{asset("js/select2.full.min.js")}}></script>
+        <script src={{asset("js/bootstrap-datepicker.min.js")}}></script>
+        <script src={{asset("js/bootstrap-datepicker.fr.min.js")}}></script>
+
+
+
+        
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

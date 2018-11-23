@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projet{% endblock %}
+
+{% block body %}
+
+<h2>Projet</h2>
+
+<a href="{{ path('projet_new') }}" class='button'>Créer nouveau projet</a>
+    <table id="grid-data" class="table table-condensed table-hover table-striped">
+        <thead >
+            <tr>
+                <th  data-column-id="id" data-visible="false" data-sortable="false">Id</th>
+                <th data-column-id="projet">projet</th>
+                <th data-column-id="charge estime">charge estimé</th>
+                <th data-column-id="progression">progression</th>
+                <th data-column-id="action" data-formatter="commands" data-sortable="false">actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for projet in projets %}
+            <tr>
+                <td>{{ projet.id }}</td>
+                <td>{{ projet.Name }}</td>
+                <td>{{ projet.chargeEstime }} h</td>
+                <td>{{ projet.progression }} %</td>
+                <td>
+                   
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+   
+{% endblock %}
+{% block javascripts %}
+<script>
+        var grid = $("#grid-data").bootgrid({
+            rowCount: [
+                5 ,10  , -1
+            ],
+            ajax: false,
+            
+            formatters: {
+                "commands": function (column, row) {
+                    return "<button type=\"button\" class=\"btn btn-xs btn-default command-view\" data-row-id=\"" + row.id + "\"><span class=\"fas fa-pencil-alt\"></span></button> ";
+                },
+                
+            }
+
+        }).on("loaded.rs.jquery.bootgrid", function () {
+            /* Executes after data is loaded and rendered */
+            grid.find(".command-view").on("click", function (e) {
+                var url = "{{ path('projet_edit', {'id': 'edit_id'}) }}";
+                var id = $(this).attr("data-row-id");
+                url = url.replace("edit_id", id);
+                window.location.href = url;
+            
+            })
+        });
+</script>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Activite{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Créer une nouvelle activité</h1>
+
+    {{ include('activite/_form.html.twig') }}
+    
+    <a class='button btn-bar' href="{{ path('index') }}">Retour</a>
+
+</div>
+{% endblock %}
+{% block javascripts %}
+<script >
+    var user = '{{ app.user.id}}';
+    
+        $('#activite_utilisateur option[value=' + user+']').prop('selected', true);
+        $('#activite_date').datepicker({language: 'fr', format: 'dd/mm/yyyy', todayBtn: true, todayHighlight: true, autoclose: true});
+</script>
+{% endblock %}

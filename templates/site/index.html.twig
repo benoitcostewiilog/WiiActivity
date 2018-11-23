@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Site/Client{% endblock %}
+
+{% block body %}
+
+<h2>Site/Client</h2>
+
+<a href="{{ path('site_new') }}" class='button'>Créer nouveau site/client</a>
+    <table id="grid-data" class="table table-condensed table-hover table-striped">
+        <thead>
+            <tr>
+                <th data-column-id="id" data-visible="false" data-sortable="false">Id</th>
+                <th data-column-id="name">Name</th>
+                <th data-column-id="commands" data-formatter="commands" data-sortable="false">actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for site in sites %}
+            <tr>
+                <td>{{ site.id }}</td>
+                <td>{{ site.name }}</td>
+                <td>
+                   
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+   
+{% endblock %}
+{% block javascripts %}
+<script>
+        var grid = $("#grid-data").bootgrid({
+            rowCount: [
+                10 ,25 ,50  , -1
+            ],
+            ajax: false,
+            
+            formatters: {
+                "commands": function (column, row) {
+                    return "<button type=\"button\" class=\"btn btn-xs btn-default command-view\" data-row-id=\"" + row.id + "\"><span class=\"fas fa-pencil-alt\"></span></button> ";
+                },
+                
+            }
+
+        }).on("loaded.rs.jquery.bootgrid", function () {
+            /* Executes after data is loaded and rendered */
+            grid.find(".command-view").on("click", function (e) {
+                var url = "{{ path('site_edit', {'id': 'edit_id'}) }}";
+                var id = $(this).attr("data-row-id");
+                url = url.replace("edit_id", id);
+                window.location.href = url;
+            
+            })
+        });
+</script>
+{% endblock %}
