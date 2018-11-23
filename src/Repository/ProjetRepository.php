@@ -18,6 +18,39 @@ class ProjetRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Projet::class);
     }
+    
+    public function compte()
+    {
+        return $this->createQueryBuilder('a')
+                    ->select('COUNT(a)')
+                    ->getQuery()
+                    ->getSingleScalarResult();
+    }
+
+    public function findByFilter($sort, $searchPhrase)
+    {
+        $qb = $this->createQueryBuilder('projet');
+        $parameters = [];
+        $key_id = 0;
+
+        if ($searchPhrase != "") {
+            $qb ->andWhere('projet.name LIKE :search
+                OR projet.chargeEstime LIKE :search
+                OR projet.progression LIKE :search
+            ')
+                ->setParameter('search', '%' . $searchPhrase . '%');
+        }
+
+        if ($sort) {
+            foreach ($sort as $key => $value) {
+                $qb->orderBy('projet.' . $key, $value);
+            }
+        } else {
+            $qb->orderBy('projet.name', 'ASC');
+        }
+
+        return $qb;
+    }
 
     // /**
     //  * @return Projet[] Returns an array of Projet objects
