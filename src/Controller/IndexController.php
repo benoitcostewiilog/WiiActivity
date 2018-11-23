@@ -57,7 +57,6 @@ class IndexController extends AbstractController
      */
     public function index(Request $request, ActiviteRepository $activiteRepository)
     {
-        $activiteRepository->findByFilter('',[],[],'','',[],'');
         if ($request->isXmlHttpRequest()) {
             $utilisateur = $request->request->get('utilisateur');
             $site = $request->request->get('site');
@@ -102,7 +101,7 @@ class IndexController extends AbstractController
                     "projet" => $activite->getProjet()->getName(),
                     "temps" => $activite->getTemps(),
                     "tache" => $activite->getTache(),
-                    "avancement" => 1,//round($this->getAvancement($activite), 1)." %",
+                    "avancement" => round($this->getAvancement($activite), 1)." %",
                     "progression" => $activite->getProjet()->getProgression(),
                 ];
                 array_push($rows, $row);
@@ -115,7 +114,6 @@ class IndexController extends AbstractController
                 "total" => intval($count)
             );
 
-            dump($data);
             return new JsonResponse($data);
         }
 

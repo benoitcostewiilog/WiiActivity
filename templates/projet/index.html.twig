@@ -3,7 +3,6 @@
 {% block title %}Projet{% endblock %}
 
 {% block body %}
-
 <h2>Projet</h2>
 
 <a href="{{ path('projet_new') }}" class='button'>Créer nouveau projet</a>
@@ -12,27 +11,14 @@
             <tr>
                 <th  data-column-id="id" data-visible="false" data-sortable="false">Id</th>
                 <th data-column-id="projet">projet</th>
-                <th data-column-id="charge estime">charge estimé</th>
-                <th data-column-id="progression">progression</th>
+                <th data-column-id="chargEstime">charge estimé</th>
+                <th data-column-id="progression" data-sortable="false">progression</th>
+                <th data-column-id="avancement" data-formatter="avancement" data-sortable="false">avancement</th>
                 <th data-column-id="action" data-formatter="commands" data-sortable="false">actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for projet in projets %}
-            <tr>
-                <td>{{ projet.id }}</td>
-                <td>{{ projet.Name }}</td>
-                <td>{{ projet.chargeEstime }} h</td>
-                <td>{{ projet.progression }} %</td>
-                <td>
-                   
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
+        
         </tbody>
     </table>
 
@@ -44,12 +30,16 @@
             rowCount: [
                 5 ,10  , -1
             ],
-            ajax: false,
-            
+            ajax: true,
+                url: "{{ path('projet_index') }}",
             formatters: {
                 "commands": function (column, row) {
                     return "<button type=\"button\" class=\"btn btn-xs btn-default command-view\" data-row-id=\"" + row.id + "\"><span class=\"fas fa-pencil-alt\"></span></button> ";
                 },
+                "avancement": function (column, row) {
+                    return "<div class='progress'><div class='progress-bar' role='progressbar' style='width: "+ row.avancement+"%' aria-valuemax='100'></div></div>";
+                },
+                
                 
             }
 
