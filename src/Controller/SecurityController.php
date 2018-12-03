@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use App\Entity\Utilisateur;
 use App\Form\UtilisateurType;
+use App\Repository\utilisateurRepository;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -35,7 +36,8 @@ class SecurityController extends AbstractController
     /** 
      *  @Route("/logout", name="logout")
     */
-    public function logout(){
+    public function logout()
+    {
         
         return $this->redirectToRoute('login');
     }
