@@ -27,6 +27,7 @@ class ActiviteType extends AbstractType
             ->add('temps', IntegerType::class, array(
                 'attr' => array(
                      'placeholder' => 'Heure de travail',
+                     'min' =>0, 'max' =>100
                 ),
              ))
             ->add('site', EntityType::class, array(

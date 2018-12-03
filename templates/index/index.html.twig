@@ -30,6 +30,8 @@
         <button id='filter' class='button'><i class="fas fa-filter"></i> Filtrer</button>
     </form>
 
+        <h2>Ajout  d'une activité</h2>
+
     {{ form_start(form, {'attr': {'class': 'activite-wrapper'}}) }}
     {{ form_errors(form) }}
         {{ form_widget(form.date, {'attr': {'class': 'tabable'}}) }}
@@ -123,7 +125,7 @@
 
     var grid = $("#grid-data").bootgrid({
         rowCount: [
-                -1, 10 , 25, 50
+                -1, 10, 25, 50
         ],
         ajax: true,
         requestHandler: function (request) {

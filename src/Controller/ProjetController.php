@@ -102,7 +102,7 @@ class ProjetController extends AbstractController
             $em->persist($projet);
             $em->flush();
 
-            return $this->redirectToRoute('index');
+            return $this->redirectToRoute('projet_index');
         }
 
         return $this->render('projet/new.html.twig', [
