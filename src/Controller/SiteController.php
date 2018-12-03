@@ -37,7 +37,7 @@ class SiteController extends AbstractController
             $em->persist($site);
             $em->flush();
 
-            return $this->redirectToRoute('index');
+            return $this->redirectToRoute('site_index');
         }
 
         return $this->render('site/new.html.twig', [
