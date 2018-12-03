@@ -25,7 +25,8 @@ class ProjetController extends AbstractController
        foreach($query as $q){
            $total += $q->getTemps();
        }
-       return $total * 100 / $estime;
+       $ret = $estime > 0 ? $total * 100 / $estime : 0;
+       return $ret;
    }
 
 

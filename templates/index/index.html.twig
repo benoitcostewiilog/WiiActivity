@@ -64,8 +64,33 @@
     var user = '{{ app.user.id}}';
     $('#activite_utilisateur option[value=' + user+']').prop('selected', true);
 
+    /* Date
+    ================= */
     $('#datedebut, #datefin, #activite_date').datepicker({language: 'fr', format: 'dd/mm/yyyy', todayBtn: true, todayHighlight: true, autoclose: true});
-   
+
+    var now = new Date();
+    $('#datedebut').val(createDate(now.getDate(), now.getMonth() + 1, now.getFullYear()));
+    now.setMonth(now.getMonth() + 1);
+    $('#datefin').val(createDate(now.getDate(), now.getMonth() + 1, now.getFullYear()));
+
+    $('#datedebut, #datefin, #activite_date').on('change', function() {
+        let date = $(this).val();
+        let res = date.split("/");
+        if (res[2] && res[2].length != 4) {
+            res[2] = parseInt(res[2]) + 2000; 
+            date = createDate(res[0], res[1], res[2]);
+            $(this).val(date);
+        }
+    });
+
+    function createDate(day, month, year) {
+        return (('0' + day).slice(-2) + '/'
+             + ('0' + (month)).slice(-2) + '/'
+             + year);
+    }
+
+    /* Select2 
+    ================= */
     let projet= [];
     $('#projet').on('select2:select', function (e) {
         $.each($(this).select2('data'), function(i){
@@ -92,13 +117,13 @@
     $('#site').select2({placeholder: 'Site'});
     $('#utilisateur').select2({placeholder: 'Utilisateur'});
     $('#projet').select2({placeholder: 'Projet'});
-    $('#activite_site').select2({placeholder: 'Site'});
-    $('#activite_projet').select2({placeholder: 'Projet'});
-    $('#activite_utilisateur').select2({placeholder: 'Utilisateur'});
+    $('#activite_site').select2({placeholder: 'Site'}).on('select2:open', function (e) {setCurIndex($(this));});
+    $('#activite_projet').select2({placeholder: 'Projet'}).on('select2:open', function (e) {setCurIndex($(this));});
+    $('#activite_utilisateur').select2({placeholder: 'Utilisateur'}).on('select2:open', function (e) {setCurIndex($(this));});
 
     var grid = $("#grid-data").bootgrid({
         rowCount: [
-                10 , 25, 50, -1
+                -1, 10 , 25, 50
         ],
         ajax: true,
         requestHandler: function (request) {
@@ -120,7 +145,9 @@
             /* Executes after data is loaded and rendered */
             let total = 0;
             $('#grid-data > tbody > tr').each(function(i) {
-                total += parseInt($(this).find('td:eq(2)').text());
+                if ($(this).find('td:eq(2)').text() > 0) {
+                    total += parseInt($(this).find('td:eq(2)').text());
+                }
             });
             $("#grid-data tbody").append('<tr><td>Total</td><td></td><td>' + total + '</td><td></td><td></td><td></td><td></td></tr>')
             grid.find(".command-view").on("click", function (e) {
@@ -146,8 +173,8 @@
     });
 
     var curIndex = -1;
+    var tabbables = $(".wrapper").find(".tabable");
     function OnFocusOut() {
-        var tabbables = $(".wrapper").find(".tabable");
         curIndex += 1;
         if (curIndex >= tabbables.length) {
             curIndex = 0;
@@ -155,8 +182,22 @@
         tabbables[curIndex].focus();
     }
 
+    $(".tabable").on('focus', function() {
+        setCurIndex($(this));
+    });
+
+    function setCurIndex(tabableId) {
+        $.each(tabbables, function(i) {
+            if (tabableId[0] === tabbables[i]) {
+                curIndex = i;
+                return;
+            }
+        });
+    }
+
     $('#add-activite').on('click', function(e) {
         e.preventDefault();
+        console.log($('#activite_tache').select2('data')[0].tache);
         $.ajax({
             url: "{{ path('activite_add') }}",
             type: "POST",
@@ -166,7 +207,7 @@
                 "temps": $('#activite_temps').val(),
                 "site": $('#activite_site').val(),
                 "projet": $('#activite_projet').val(),
-                "tache": $('#activite_tache').val(),
+                "tache": $('#activite_tache').select2('data')[0].tache,
                 "utilisateur": $('#activite_utilisateur').val(),
             },
             success: function (resp) {
@@ -200,7 +241,7 @@
         minimumInputLength: 1,
         templateResult: formatRef,
         templateSelection: formatRefSelection,
-    });
+    }).on('select2:open', function (e) {setCurIndex($(this));});
 
     function formatRef(ref) {
         if (ref.loading) {

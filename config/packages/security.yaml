@@ -22,7 +22,7 @@ security:
                 login_path: login
                 check_path: login
                 provider: our_db_provider
-                default_target_path: /index
+                default_target_path: /activite
                 always_use_default_target_path: true
                 csrf_token_generator: security.csrf.token_manager
             remember_me:

@@ -89,7 +89,7 @@ class ActiviteController extends AbstractController
             $em->flush();
         }
 
-        return $this->redirectToRoute('activite_index');
+        return $this->redirectToRoute('index');
     }
 
     /**
@@ -100,24 +100,32 @@ class ActiviteController extends AbstractController
         if ($request->isXmlHttpRequest()) {
             $date = $request->request->get('date');
             $temps = $request->request->get('temps');
+            $temps = (intval($temps) < 0 || $temps == "") ? 0 : $temps;
             $site = $request->request->get('site');
             $projet = $request->request->get('projet');
             $tache = $request->request->get('tache');
             $utilisateur = $request->request->get('utilisateur');
 
+            $exp = explode("/", $date);
+            $date = ($date != "" && strlen($exp[2])) != 4 ? "" : $date;
+
             $em = $this->getDoctrine();
-            $activite = new Activite();
-            $activite->setDate(\DateTime::createFromFormat("d/m/Y H:i:s", $date . " 00:00:00"));
-            $activite->setTemps($temps);
-            $activite->setSite($em->getRepository(Site::class)->findOneBy(['id' => $site]));
-            $activite->setProjet($em->getRepository(Projet::class)->findOneBy(['id' => $projet]));
-            $activite->setTache($tache);
-            $activite->setUtilisateur($em->getRepository(Utilisateur::class)->findOneBy(['id' => $utilisateur]));
+            if ($date != "" && $site != "" && $projet != "" && $tache != "") {
+                $activite = new Activite();
+                $activite->setDate(\DateTime::createFromFormat("d/m/Y H:i:s", $date . " 00:00:00"));
+                $activite->setTemps(intval($temps));
+                $activite->setSite($em->getRepository(Site::class)->findOneBy(['id' => $site]));
+                $activite->setProjet($em->getRepository(Projet::class)->findOneBy(['id' => $projet]));
+                $activite->setTache($tache);
+                $activite->setUtilisateur($em->getRepository(Utilisateur::class)->findOneBy(['id' => $utilisateur]));
 
-            $em->getManager()->persist($activite);
-            $em->getManager()->flush();
+                $em->getManager()->persist($activite);
+                $em->getManager()->flush();
+            
+                return new JsonResponse(1);
+            }
 
-            return new JsonResponse();
+            return new JsonResponse(0);
         }
     }
 

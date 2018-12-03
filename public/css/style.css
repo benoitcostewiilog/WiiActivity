@@ -5,6 +5,70 @@ a, a:hover {
 	text-decoration: none;
 }
 
+/* Button
+================= */
+
+.button, .button:focus {
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	display: inline-block;
+	-webkit-transition-duration: 0.4s;
+	transition-duration: 0.4s;
+	border-radius: 50px;
+	padding: 10px 20px 10px 20px;
+	margin: 5px 0;
+	font-size: 17px;
+	background-color: #130078;
+	color: #fcfcfc;
+	border: #130078 1.5px solid;
+	line-height: inherit;
+}
+
+.button:hover, .tabable:focus {
+	background: #fcfcfc;
+	color: #130078;
+}
+
+.button-danger:focus {
+	border-color: #CC0000;
+	background-color: #CC0000;
+	color: #fcfcfc;
+}
+
+.button-danger {
+	background-color: #CC0000;
+	border: #CC0000 1.5px solid;
+	color: #fcfcfc;
+}
+
+.button-danger:hover {
+	color: #CC0000;
+	background-color: #fcfcfc;
+}
+
+.btn-right .fa {
+	font-size: 20px;
+	padding-left: 10px;
+	vertical-align: top;
+}
+
+.btn-left .fa {
+	font-size: 20px;
+	padding-right: 10px;
+	vertical-align: top;
+}
+
+.btn-grp .button {
+	margin-right: 20px;
+	margin-bottom: -50px;
+	float: right;
+}
+
+.btn-row {
+	margin: 15px 0;
+}
+
 /* Side menu
 ================= */
 
@@ -158,7 +222,7 @@ a, a:hover {
 */
 
 .select2 {
-	width: 100%!important;
+	width: 100% !important;
 }
 
 .filter-wrapper {
@@ -194,7 +258,7 @@ a, a:hover {
 
 .select2-selection {
 	border: 1px solid #ccc !important;
-	height: 34px !important;
+	min-height: 34px !important;
 	line-height: 1.42857143!important;
 	color: #555 !important;
 	background-color: #fff !important;
@@ -202,7 +266,7 @@ a, a:hover {
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-	height: 34px !important;
+	min-height: 34px !important;
 }
 
 .backgrey {
@@ -225,70 +289,6 @@ a, a:hover {
 	flex-direction: row;
 	justify-content: space-between;
 	margin-top: 2%;
-}
-
-/* Button
-================= */
-
-.button, .button:focus {
-	text-align: center;
-	text-decoration: none;
-	cursor: pointer;
-	display: inline-block;
-	-webkit-transition-duration: 0.4s;
-	transition-duration: 0.4s;
-	border-radius: 50px;
-	padding: 10px 20px 10px 20px;
-	margin: 5px 0;
-	font-size: 17px;
-	background-color: #130078;
-	color: #fcfcfc;
-	border: #130078 1.5px solid;
-	line-height: inherit;
-}
-
-.button:hover, .tabable:focus {
-	background: #fcfcfc;
-	color: #130078;
-}
-
-.button-danger:focus {
-	border-color: #CC0000;
-	background-color: #CC0000;
-	color: #fcfcfc;
-}
-
-.button-danger {
-	background-color: #CC0000;
-	border: #CC0000 1.5px solid;
-	color: #fcfcfc;
-}
-
-.button-danger:hover {
-	color: #CC0000;
-	background-color: #fcfcfc;
-}
-
-.btn-right .fa {
-	font-size: 20px;
-	padding-left: 10px;
-	vertical-align: top;
-}
-
-.btn-left .fa {
-	font-size: 20px;
-	padding-right: 10px;
-	vertical-align: top;
-}
-
-.btn-grp .button {
-	margin-right: 20px;
-	margin-bottom: -50px;
-	float: right;
-}
-
-.btn-row {
-	margin: 15px 0;
 }
 
 /* Table

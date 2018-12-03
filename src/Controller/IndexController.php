@@ -66,7 +66,7 @@ class IndexController extends AbstractController
     }
 
     /**
-     * @Route("/index", name="index")
+     * @Route("/activite", name="index")
      */
     public function index(Request $request, ActiviteRepository $activiteRepository)
     {
