@@ -2,15 +2,27 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Activite;
 use App\Entity\Site;
 use App\Entity\Projet;
 use App\Entity\Utilisateur;
+use App\Form\ActiviteType;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ActiviteRepository;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 
 class IndexController extends AbstractController
@@ -22,31 +34,32 @@ class IndexController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
 
-        for ($i=0; $i < 2000 ; $i++) { 
+        for ($i = 0; $i < 200; $i++) {
             $activite = new Activite;
-            $activite->setdate(new \DateTime('2011-01-01T15:03:01.012345Z'));
+            $activite->setdate(new \DateTime('2018-01-01T15:03:01.012345Z'));
             $activite->setTemps(3);
             dump("helle");
-            dump($this->getDoctrine()->getRepository(Site::class)->findOneBy(["id"=>1]));
-            $activite->setSite($this->getDoctrine()->getRepository(Site::class)->findOneBy(["id"=>1]));
-            $activite->setProjet($this->getDoctrine()->getRepository(Projet::class)->findOneBy(["id"=>3]));
-            $activite->setUtilisateur($this->getDoctrine()->getRepository(Utilisateur::class)->findOneBy(["id"=>1]));
-            $activite->setTache('tache');
-            
+            dump($this->getDoctrine()->getRepository(Site::class)->findOneBy(["id" => 1]));
+            $activite->setSite($this->getDoctrine()->getRepository(Site::class)->findOneBy(["id" => 1]));
+            $activite->setProjet($this->getDoctrine()->getRepository(Projet::class)->findOneBy(["id" => 3]));
+            $activite->setUtilisateur($this->getDoctrine()->getRepository(Utilisateur::class)->findOneBy(["id" => 1]));
+            $activite->setTache('Tache ' . i);
+
             $em->persist($activite);
             $em->flush();
 
         }
-            return $this->redirectToRoute("index");
+        return $this->redirectToRoute("index");
     }
 
-    private function getAvancement($activite){
-         $estime = $activite->getProjet()->getChargeEstime();
-         $query = $this->getDoctrine()->getRepository(Activite::class)->findBy(
+    private function getAvancement($activite)
+    {
+        $estime = $activite->getProjet()->getChargeEstime();
+        $query = $this->getDoctrine()->getRepository(Activite::class)->findBy(
             ['projet' => $activite->getProjet()]
         );
         $total = 0;
-        foreach($query as $q){
+        foreach ($query as $q) {
             $total += $q->getTemps();
         }
         return $total * 100 / $estime;
@@ -57,11 +70,14 @@ class IndexController extends AbstractController
      */
     public function index(Request $request, ActiviteRepository $activiteRepository)
     {
+        $activite = new Activite();
+        $form = $this->createForm(ActiviteType::class, $activite);
+
         if ($request->isXmlHttpRequest()) {
             $utilisateur = $request->request->get('utilisateur');
             $site = $request->request->get('site');
             $projet = $request->request->get('projet');
-           
+
             $datedebut = $request->request->get('datedebut');
             $datefin = $request->request->get('datefin');
 
@@ -75,8 +91,8 @@ class IndexController extends AbstractController
             $datefin = \DateTime::createFromFormat("d/m/Y H:i:s", $datefin . " 23:59:59");
 
             $activites = $activiteRepository->findByFilter($utilisateur, $site, $projet, $datedebut, $datefin, $sort, $searchPhrase);
-        
-            if ($searchPhrase != "" ) {
+
+            if ($searchPhrase != "") {
                 $count = count($activites->getQuery()->getResult());
             } else {
                 $count = $activiteRepository->compte();
@@ -96,13 +112,12 @@ class IndexController extends AbstractController
             foreach ($activites as $activite) {
                 $row = [
                     "id" => $activite->getId(),
+                    "utilisateur" => $activite->getUtilisateur()->getNom(),
                     "site" => $activite->getSite()->getName(),
                     "date" => $activite->getDate()->format('d-m-Y'),
                     "projet" => $activite->getProjet()->getName(),
                     "temps" => $activite->getTemps(),
                     "tache" => $activite->getTache(),
-                    "avancement" => round($this->getAvancement($activite), 1)." %",
-                    "progression" => $activite->getProjet()->getProgression(),
                 ];
                 array_push($rows, $row);
             }
@@ -121,14 +136,72 @@ class IndexController extends AbstractController
         $projets = $this->getDoctrine()->getRepository(Projet::class)->findAll();
         $utilisateurs = $this->getDoctrine()->getRepository(Utilisateur::class)->findAll();
 
-
         return $this->render('index/index.html.twig', [
             'controller_name' => 'IndexController',
             'sites' => $sites,
             'projets' => $projets,
             'utilisateurs' => $utilisateurs,
-            
-
+            'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/export", name="export")
+     */
+    public function export(ActiviteRepository $activiteRepository)
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $serializer = new Serializer([$normalizer], [new CsvEncoder(';')]);
+
+        $callback = function ($dateTime) {
+            return $dateTime instanceof \DateTime
+                ? $dateTime->format('d/m/y')
+                : '';
+        };
+        $normalizer->setCallbacks(array(
+            'date' => $callback,
+        ));
+
+        $org = $activiteRepository->findAll();
+        $data = $serializer->serialize($org, 'csv', array('groups' => array('activite')));
+        $data = str_replace(
+            "date;temps;tache;utilisateur.nom;projet.name;projet.progression;projet.charge_estime;site.name",
+            "Date;Temps;Tache;Nom de l'utilisateur;Projet;Progression du projet;Charge estimée du projet;Site",
+            $data
+        );
+        $fileName = "export_activites_" . date("d_m_Y") . ".csv";
+        $response = new Response($data);
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8; application/excel');
+        $response->headers->set('Content-Disposition', 'attachment; filename=' . $fileName);
+        echo "\xEF\xBB\xBF"; // UTF-8 with BOM
+        return $response;
+    }
+
+    /**
+     * @Route("/tache", name="get_tache")
+     */
+    public function getTache(Request $request, ActiviteRepository $activiteRepository)
+    {
+        if ($request->isXmlHttpRequest()) {
+            $q = $request->query->get('q');
+            $activites = $activiteRepository->findBySearch($q);
+            $rows = array();
+            foreach ($activites as $activite) {
+                $row = [
+                    "id" => $activite->getId(),
+                    "tache" => $activite->getTache(),
+                ];
+                array_push($rows, $row);
+            }
+
+            $data = array(
+                "total_count" => count($rows),
+                "items" => $rows,
+            );
+            return new JsonResponse($data);
+        }
+        throw new NotFoundHttpException('404 not found');
     }
 }

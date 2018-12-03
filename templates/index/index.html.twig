@@ -1,61 +1,70 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Activité!{% endblock %}
+{% block title %}Activité{% endblock %}
 
 {% block body %}
 
+    <form action="" class='row backgrey filter-wrapper'>
+        <div class="input-group daterange">
+            <div class="input-group-addon">De</div>
+            <input type="text" id='datedebut'  class='form-control' placeholder="Date de début">
+            <div class="input-group-addon">à</div>
+            <input type="text" id='datefin' class='form-control' placeholder="Date de fin">
+        </div>
+        <select type="text" id='site' class="form-control basic-multiple-etat"  multiple="multiple">
+            
+            {% for site in sites %}
+                <option value={{site.name}}>{{site.name}}</option>
+            {% endfor %}
+        </select>
+        <select type="text" id='utilisateur' class="form-control basic-multiple-etat"  multiple="multiple">
+            {% for utilisateur in utilisateurs %}
+                <option value={{utilisateur.nom}}>{{utilisateur.nom}}</option>
+            {% endfor %}
+        </select>
+        <select type="text" id='projet' class="form-control basic-multiple-etat" multiple="multiple">
+            {% for projet in projets %}
+                <option value={{projet.name}}>{{projet.name}}</option>
+            {% endfor %}
+        </select>
+        <button id='filter' class='button'><i class="fas fa-filter"></i> Filtrer</button>
+    </form>
 
-
-<form action="" class='row backgrey filter-wrapper'>
-    <div class="input-group daterange">
-        <div class="input-group-addon">De</div>
-        <input type="text" id='datedebut'  class='form-control' placeholder="date début">
-        <div class="input-group-addon">à</div>
-        <input type="text" id='datefin' class='form-control' placeholder='date fin'>
-    </div>
-    <select type="text" id='site' class="form-control basic-multiple-etat"  multiple="multiple">
-        
-        {% for site in sites %}
-            <option value={{site.name}}>{{site.name}}</option>
-        {% endfor %}
-    </select>
-    <select type="text" id='utilisateur' class="form-control basic-multiple-etat"  multiple="multiple">
-        {% for utilisateur in utilisateurs %}
-            <option value={{utilisateur.nom}}>{{utilisateur.nom}}</option>
-        {% endfor %}
-    </select>
-    <select type="text" id='projet' class="form-control basic-multiple-etat" multiple="multiple">
-        {% for projet in projets %}
-            <option value={{projet.name}}>{{projet.name}}</option>
-        {% endfor %}
-    </select>
-    <button id='filter' class='button'>filtre</button>
-</form>
-<div class='btn-bar'>
-    <a class='button ' href={{path('activite_new')}}>ajouter une activité</a>
-</div>
+    {{ form_start(form, {'attr': {'class': 'activite-wrapper'}}) }}
+    {{ form_errors(form) }}
+        {{ form_widget(form.date, {'attr': {'class': 'tabable'}}) }}
+        {{ form_widget(form.temps, {'attr': {'class': 'tabable'}}) }}
+        {{ form_widget(form.site, {'attr': {'class': 'tabable'}}) }}
+        {{ form_widget(form.tache, {'attr': {'class': 'tabable js-data-ajax'}}) }}
+        {{ form_widget(form.utilisateur, {'attr': {'class': 'tabable'}}) }}
+        {{ form_widget(form.projet, {'attr': {'class': 'tabable'}}) }}
+    {{ form_row(form._token) }}
+    {{ form_end(form, {'render_rest' : false}) }}
+    <button id='add-activite' class='button pull-right tabable'><i class="fas fa-plus"></i> Ajouter une activité</button>
 
     <table id="grid-data" class="table table-condensed table-hover table-striped">
         <thead>
             <tr>
                 <th data-column-id="id" data-visible="false" data-sortable="false">Id</th>
+                <th data-column-id="utilisateur">Utilisateur</th>
                 <th data-column-id="date">Date</th>
-                <th data-column-id="temps">temps</th>
-                <th data-column-id="site">site/client</th>
-                <th data-column-id="projet">projet</th>
-                <th data-column-id="tache">tache</th>
-                <th data-column-id="avancement" data-sortable="false">avancement</th>
-                <th data-column-id="progression" data-formatter="progression" data-sortable="false">progression</th>
-                <th data-column-id="commands" data-formatter="commands" data-sortable="false">action</th>
+                <th data-column-id="temps">Heure de travail</th>
+                <th data-column-id="site">Site/Client</th>
+                <th data-column-id="projet">Projet</th>
+                <th data-column-id="tache">Tache</th>
+                <th data-column-id="commands" data-formatter="commands" data-sortable="false">Action</th>
             </tr>
         </thead>
     </table>
+    <a class='button' href={{path('export')}}><i class="fas fa-file-download"></i> Exporter</a>
 
 {% endblock %}
 {% block javascripts %}
-<script >
-   
-    $('#datedebut, #datefin').datepicker({language: 'fr', format: 'dd/mm/yyyy', todayBtn: true, todayHighlight: true, autoclose: true});
+<script>
+    var user = '{{ app.user.id}}';
+    $('#activite_utilisateur option[value=' + user+']').prop('selected', true);
+
+    $('#datedebut, #datefin, #activite_date').datepicker({language: 'fr', format: 'dd/mm/yyyy', todayBtn: true, todayHighlight: true, autoclose: true});
    
     let projet= [];
     $('#projet').on('select2:select', function (e) {
@@ -80,14 +89,16 @@
     
       let start = 0;
 
-      $('#site').select2({placeholder: 'site'});
-      $('#utilisateur').select2({placeholder: 'utilisateur'});
-      $('#projet').select2({placeholder: 'projet'});
+    $('#site').select2({placeholder: 'Site'});
+    $('#utilisateur').select2({placeholder: 'Utilisateur'});
+    $('#projet').select2({placeholder: 'Projet'});
+    $('#activite_site').select2({placeholder: 'Site'});
+    $('#activite_projet').select2({placeholder: 'Projet'});
+    $('#activite_utilisateur').select2({placeholder: 'Utilisateur'});
 
-    
     var grid = $("#grid-data").bootgrid({
         rowCount: [
-            10 ,25 ,50  , -1
+                10 , 25, 50, -1
         ],
         ajax: true,
         requestHandler: function (request) {
@@ -104,19 +115,19 @@
             "commands": function (column, row) {
                 return "<button type=\"button\" class=\"btn btn-xs btn-default command-view\" data-row-id=\"" + row.id + "\"><span class=\"fas fa-pencil-alt\"></span></button> ";
             },
-            "progression": function (column, row) {
-                return "<div class='progress'><div class='progress-bar' role='progressbar' style='width: "+ row.progression+"%' aria-valuemax='100'></div></div>";
-            },
         }
-
-    }).on("loaded.rs.jquery.bootgrid", function () {
-        /* Executes after data is loaded and rendered */
-        grid.find(".command-view, .etiquette").on("click", function (e) {
-            var url = "{{ path('activite_edit', {'id': 'edit_id'}) }}";
-            var id = $(this).attr("data-row-id");
-            url = url.replace("edit_id", id);
-            window.location.href = url;
-          
+        }).on("loaded.rs.jquery.bootgrid", function () {
+            /* Executes after data is loaded and rendered */
+            let total = 0;
+            $('#grid-data > tbody > tr').each(function(i) {
+                total += parseInt($(this).find('td:eq(2)').text());
+            });
+            $("#grid-data tbody").append('<tr><td>Total</td><td></td><td>' + total + '</td><td></td><td></td><td></td><td></td></tr>')
+            grid.find(".command-view").on("click", function (e) {
+                var url = "{{ path('activite_edit', {'id': 'edit_id'}) }}";
+                var id = $(this).attr("data-row-id");
+                url = url.replace("edit_id", id);
+                window.location.href = url;
         })
     });
 
@@ -125,6 +136,89 @@
         e.preventDefault();
         $("#grid-data").bootgrid('reload');
     });
+
+    $("html").on('keydown', function(e) { 
+    var keyCode = e.keyCode || e.which; 
+    if (keyCode == 9) { 
+        e.preventDefault(); 
+        OnFocusOut();
+        } 
+    });
+
+    var curIndex = -1;
+    function OnFocusOut() {
+        var tabbables = $(".wrapper").find(".tabable");
+        curIndex += 1;
+        if (curIndex >= tabbables.length) {
+            curIndex = 0;
+        }
+        tabbables[curIndex].focus();
+    }
+
+    $('#add-activite').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: "{{ path('activite_add') }}",
+            type: "POST",
+            dataType: "json",
+            data: {
+                "date": $('#activite_date').val(),
+                "temps": $('#activite_temps').val(),
+                "site": $('#activite_site').val(),
+                "projet": $('#activite_projet').val(),
+                "tache": $('#activite_tache').val(),
+                "utilisateur": $('#activite_utilisateur').val(),
+            },
+            success: function (resp) {
+                $("#grid-data").bootgrid('reload');
+            }
+        });
+    });
+
+    /* Select tache 
+    ================= */
+    $(".js-data-ajax").select2({
+        tags: true,
+        ajax: {
+            url: "{{ path('get_tache') }}",
+            delay: 250,
+            data: function (params) {
+                return {q: params.term, page: params.page};
+            },
+            processResults: function (data, params) {
+                return {
+                    results: data.items,
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Tâche',
+        allowClear: true,
+        escapeMarkup: function (markup) {
+            return markup;
+        },
+        minimumInputLength: 1,
+        templateResult: formatRef,
+        templateSelection: formatRefSelection,
+    });
+
+    function formatRef(ref) {
+        if (ref.loading) {
+            return ref.text;
+        } else if (ref.tache) {
+            return "<div class='select2-result-ref clearfix'>" + ref.tache +"</div>";
+        } else {
+            return ref.text;
+        }
+    }
+
+    function formatRefSelection(ref) {
+        if (ref.tache) {
+            return ref.tache;
+        } else {
+            return ref.text;
+        }
+    }
 </script>
 
 {% endblock %}

@@ -8,8 +8,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Entity\Projet;
+use App\Entity\Site;
 
 class ActiviteType extends AbstractType
 {
@@ -20,16 +23,38 @@ class ActiviteType extends AbstractType
                 'widget' => 'single_text',
                 'html5' => false,
                 'format' => 'dd/mm/yyyy',
-                'attr' => ['class' => 'js-datepicker']))
-            ->add('temps')
-            ->add('site')
-            ->add('tache')
+                'attr' => ['class' => 'js-datepicker', 'placeholder' => 'Date',]))
+            ->add('temps', IntegerType::class, array(
+                'attr' => array(
+                     'placeholder' => 'Heure de travail',
+                ),
+             ))
+            ->add('site', EntityType::class, array(
+				'class' => Site::class,
+				'choice_label' => 'name',
+				'label' => 'Site/Client',
+                'placeholder' => '',
+                'attr' => array(
+                     'placeholder' => 'Site/Client',
+                ),
+             ))
+            ->add('tache', ChoiceType::class, array(
+                'choices'  => array(
+                    '' => '',
+                ),
+                'attr' => array(
+                    'placeholder' => 'Tâche',
+               ),
+            ))
             ->add('utilisateur')
             ->add('projet',  EntityType::class, array(
 				'class' => Projet::class,
 				'choice_label' => 'name',
-				'label' => 'projet',
-				'placeholder' => '',
+				'label' => 'Projet',
+                'placeholder' => '',
+                'attr' => array(
+                    'placeholder' => 'Projet',
+               ),
 			))
         ;
     }
