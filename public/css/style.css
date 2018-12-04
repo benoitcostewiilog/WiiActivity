@@ -536,3 +536,32 @@ input:-webkit-autofill {
 .modal-footer, .modal-header {
 	border-radius: 5px;
 }
+
+/* Alert / Flashbag
+================= */
+
+.alert {
+	padding: 20px;
+	opacity: 0.9;
+	transition: opacity 0.7s;
+	margin-bottom: 15px;
+	position: fixed;
+	right: 0;
+	z-index: 10;
+	margin: 10px;
+}
+
+.closebtn {
+	margin-left: 15px;
+	color: inherit;
+	font-weight: bold;
+	float: right;
+	font-size: 22px;
+	line-height: 20px;
+	cursor: pointer;
+	transition: 0.3s;
+}
+
+.closebtn:hover {
+	color: black;
+}

@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class ActiviteController extends AbstractController
 {
     /**
-     * @Route("/", name="activite_index", methods="GET")
+     * @Route("/index", name="activite_index", methods="GET")
      */
     public function index(ActiviteRepository $activiteRepository) : Response
     {
