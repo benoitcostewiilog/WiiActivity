@@ -19,45 +19,45 @@ class ActiviteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('date',  DateType::class, array(
+            ->add('date', DateType::class, array(
                 'widget' => 'single_text',
                 'html5' => false,
                 'format' => 'dd/mm/yyyy',
-                'attr' => ['class' => 'js-datepicker', 'placeholder' => 'Date',]))
+                'attr' => ['class' => 'js-datepicker', 'placeholder' => 'Date', ]
+            ))
             ->add('temps', IntegerType::class, array(
                 'attr' => array(
-                     'placeholder' => 'Heure de travail',
-                     'min' =>0, 'max' =>100
+                    'placeholder' => 'Heure de travail',
+                    'min' => 0, 'max' => 10000
                 ),
-             ))
+            ))
             ->add('site', EntityType::class, array(
-				'class' => Site::class,
-				'choice_label' => 'name',
-				'label' => 'Site/Client',
+                'class' => Site::class,
+                'choice_label' => 'name',
+                'label' => 'Site/Client',
                 'placeholder' => '',
                 'attr' => array(
-                     'placeholder' => 'Site/Client',
+                    'placeholder' => 'Site/Client',
                 ),
-             ))
+            ))
             ->add('tache', ChoiceType::class, array(
-                'choices'  => array(
+                'choices' => array(
                     '' => '',
                 ),
                 'attr' => array(
                     'placeholder' => 'Tâche',
-               ),
+                ),
             ))
             ->add('utilisateur')
-            ->add('projet',  EntityType::class, array(
-				'class' => Projet::class,
-				'choice_label' => 'name',
-				'label' => 'Projet',
+            ->add('projet', EntityType::class, array(
+                'class' => Projet::class,
+                'choice_label' => 'name',
+                'label' => 'Projet',
                 'placeholder' => '',
                 'attr' => array(
                     'placeholder' => 'Projet',
-               ),
-			))
-        ;
+                ),
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver)

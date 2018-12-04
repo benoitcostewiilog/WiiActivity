@@ -18,28 +18,32 @@ class Utilisateur implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"user"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"activite"})
+     * @Groups({"activite", "user"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user"})
      */
-    private $premon;
+    private $prenom;
 
       /**
      * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank
+     * @Groups({"user"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user"})
      */
     private $password;
 
@@ -56,6 +60,7 @@ class Utilisateur implements UserInterface
 
     /**
      * @ORM\Column(type="array")
+     * @Groups({"user"})
      */
     private $roles;
 
@@ -93,14 +98,14 @@ class Utilisateur implements UserInterface
         return $this;
     }
 
-    public function getPremon(): ?string
+    public function getPrenom(): ?string
     {
-        return $this->premon;
+        return $this->prenom;
     }
 
-    public function setPremon(string $premon): self
+    public function setPrenom(string $prenom): self
     {
-        $this->premon = $premon;
+        $this->prenom = $prenom;
 
         return $this;
     }
@@ -162,6 +167,13 @@ class Utilisateur implements UserInterface
         // The bcrypt and argon2i algorithms don't require a separate salt.
         // You *may* need a real salt if you choose a different encoder.
         return null;
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
     }
 
     public function getRoles()

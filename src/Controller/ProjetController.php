@@ -17,24 +17,23 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class ProjetController extends AbstractController
 {
-    private function getAvancement($projet){
-        $estime = $projet->getChargeEstime();
+    private function getAvancement($projet)
+    {
         $query = $projet->getActivites();
-      
-       $total = 0;
-       foreach($query as $q){
-           $total += $q->getTemps();
-       }
-       $ret = $estime > 0 ? $total * 100 / $estime : 0;
-       return $ret;
-   }
+
+        $total = 0;
+        foreach ($query as $q) {
+            $total += $q->getTemps();
+        }
+        return $total;
+    }
 
 
     /**
      * @Route("/", name="projet_index", methods="POST|GET")
      */
-    public function index(Request $request, ProjetRepository $projetRepository): Response
-    {   
+    public function index(Request $request, ProjetRepository $projetRepository) : Response
+    {
 
         if ($request->isXmlHttpRequest()) {
             $current = $request->request->get('current');
@@ -42,9 +41,9 @@ class ProjetController extends AbstractController
             $searchPhrase = $request->request->get('searchPhrase');
             $sort = $request->request->get('sort');
 
-            $projets = $projetRepository->findByFilter( $sort, $searchPhrase);
+            $projets = $projetRepository->findByFilter($sort, $searchPhrase);
 
-            if ($searchPhrase != "" ) {
+            if ($searchPhrase != "") {
                 $count = count($projets->getQuery()->getResult());
             } else {
                 $count = $projetRepository->compte();
@@ -62,11 +61,14 @@ class ProjetController extends AbstractController
 
             $rows = array();
             foreach ($projets as $projet) {
+                $total = round($this->getAvancement($projet), 1);
+                $estime = $projet->getChargeEstime();
+                $progression = $estime > 0 ? $total * 100 / $estime : 0;
                 $row = [
                     "id" => $projet->getId(),
                     "projet" => $projet->getName(),
-                    "chargeEstime" => $projet->getChargeEstime(),
-                    "progression" => round($this->getAvancement($projet), 1)." %",
+                    "chargeEstime" => $total . ' / ' . $projet->getChargeEstime(),
+                    "progression" => $progression . " %",
                     "avancement" => $projet->getProgression(),
                 ];
                 array_push($rows, $row);
@@ -82,16 +84,15 @@ class ProjetController extends AbstractController
             return new JsonResponse($data);
         }
 
-
         return $this->render('projet/index.html.twig', [
             'controller_name' => 'IndexController',
-            ]);
+        ]);
     }
 
     /**
      * @Route("/new", name="projet_new", methods="GET|POST")
      */
-    public function new(Request $request): Response
+    public function new(Request $request) : Response
     {
         $projet = new Projet();
         $form = $this->createForm(ProjetType::class, $projet);
@@ -114,7 +115,7 @@ class ProjetController extends AbstractController
     /**
      * @Route("/{id}", name="projet_show", methods="GET")
      */
-    public function show(Projet $projet): Response
+    public function show(Projet $projet) : Response
     {
         return $this->render('projet/show.html.twig', ['projet' => $projet]);
     }
@@ -122,7 +123,7 @@ class ProjetController extends AbstractController
     /**
      * @Route("/{id}/edit", name="projet_edit", methods="GET|POST")
      */
-    public function edit(Request $request, Projet $projet): Response
+    public function edit(Request $request, Projet $projet) : Response
     {
         $form = $this->createForm(ProjetType::class, $projet);
         $form->handleRequest($request);
@@ -130,7 +131,7 @@ class ProjetController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('index');
+            return $this->redirectToRoute('projet_index');
         }
 
         return $this->render('projet/edit.html.twig', [
@@ -142,9 +143,9 @@ class ProjetController extends AbstractController
     /**
      * @Route("/{id}", name="projet_delete", methods="DELETE")
      */
-    public function delete(Request $request, Projet $projet): Response
+    public function delete(Request $request, Projet $projet) : Response
     {
-        if ($this->isCsrfTokenValid('delete'.$projet->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $projet->getId(), $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($projet);
             $em->flush();

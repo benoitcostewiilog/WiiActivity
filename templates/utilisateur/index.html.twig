@@ -10,7 +10,7 @@
             <tr>
                 <th>Id</th>
                 <th>Nom</th>
-                <th>Premon</th>
+                <th>Prénom</th>
                 <th>Password</th>
                 <th>actions</th>
             </tr>
@@ -20,7 +20,7 @@
             <tr>
                 <td>{{ utilisateur.id }}</td>
                 <td>{{ utilisateur.nom }}</td>
-                <td>{{ utilisateur.premon }}</td>
+                <td>{{ utilisateur.prenom }}</td>
                 <td>{{ utilisateur.password }}</td>
                 <td>
                     <a href="{{ path('utilisateur_show', {'id': utilisateur.id}) }}">show</a>

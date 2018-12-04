@@ -19,6 +19,35 @@ class UtilisateurRepository extends ServiceEntityRepository
         parent::__construct($registry, Utilisateur::class);
     }
 
+    /**
+     * @return Utilisateur[] Returns an array of Utilisateurs objects
+     */
+    public function findBySearchSort($searchPhrase, $sort)
+    {
+        $qb = $this->createQueryBuilder('user');
+        $parameters = [];
+        $key_id = 0;
+
+        if ($searchPhrase != "") {
+            $qb->andWhere('user.username LIKE :search
+                OR user.nom LIKE :search
+                OR user.prenom LIKE :search
+                OR user.roles LIKE :search
+            ')
+                ->setParameter('search', '%' . $searchPhrase . '%');
+        }
+
+        if ($sort) {
+            foreach ($sort as $key => $value) {
+                $qb->orderBy('user.' . $key, $value);
+            }
+        } else {
+            $qb->orderBy('user.nom', 'ASC');
+        }
+
+        return $qb;
+    }
+
     // /**
     //  * @return Parcs[] Returns an array of Parcs objects
     //  */
@@ -64,7 +93,7 @@ class UtilisateurRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    */
+     */
 
     /*
     public function findOneBySomeField($value): ?Utilisateur
@@ -76,5 +105,5 @@ class UtilisateurRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-    */
+     */
 }

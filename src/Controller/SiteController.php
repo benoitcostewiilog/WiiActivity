@@ -65,7 +65,7 @@ class SiteController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('index');
+            return $this->redirectToRoute('site_index');
         }
 
         return $this->render('site/edit.html.twig', [

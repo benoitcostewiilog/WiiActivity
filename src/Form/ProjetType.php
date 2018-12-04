@@ -18,10 +18,17 @@ class ProjetType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('charge_estime')
-            ->add('progression', IntegerType::class,  array('attr' => array('min' =>0, 'max' =>100,)))
-            ->add('name', TextType::class, array('label' => 'Nom') )
-        ;
+            ->add('name', TextType::class, array(
+                'label' => 'Nom'
+            ))
+            ->add('charge_estime', IntegerType::class, array(
+                'label' => 'Charge estimée',
+                'attr' => array('min' => 0, 'max' => 100000, )
+            ))
+            ->add('progression', IntegerType::class, array(
+                'attr' => array('min' => 0, 'max' => 100, )
+            ))
+            ;
     }
 
     public function configureOptions(OptionsResolver $resolver)

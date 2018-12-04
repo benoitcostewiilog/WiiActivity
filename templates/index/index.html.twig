@@ -58,13 +58,13 @@
             </tr>
         </thead>
     </table>
-    <a class='button' href={{path('export')}}><i class="fas fa-file-download"></i> Exporter</a>
+    <a class='button' href={{path('export')}}><i class="fas fa-file-download"></i>  Exporter</a>
 
 {% endblock %}
 {% block javascripts %}
 <script>
     var user = '{{ app.user.id}}';
-    $('#activite_utilisateur option[value=' + user+']').prop('selected', true);
+    $('#activite_utilisateur option[value=' + user +']').prop('selected', true);
 
     /* Date
     ================= */

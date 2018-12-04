@@ -17,7 +17,7 @@ a, a:hover {
 	transition-duration: 0.4s;
 	border-radius: 50px;
 	padding: 10px 20px 10px 20px;
-	margin: 5px 0;
+	/* margin: 5px 0; */
 	font-size: 17px;
 	background-color: #130078;
 	color: #fcfcfc;
@@ -279,7 +279,7 @@ a, a:hover {
 	margin-bottom: 30px;
 }
 
-.progress-bar{
+.progress-bar {
 	text-align: start !important;
 }
 
@@ -417,6 +417,18 @@ table .fa:hover {
 	color: #fcfcfcfc
 }
 
+/* Fieldset
+================= */
+
+.well-legend {
+	width: auto;
+	margin: 0;
+	padding: 0 5px;
+	border: none;
+	background-color: #fcfcfc;
+	border-radius: 60px;
+}
+
 /* Login
 ================= */
 
@@ -492,4 +504,35 @@ input:-webkit-autofill {
 .activite-wrapper>* {
 	flex: 1;
 	margin: 0 5px;
+}
+
+/* Modal
+================= */
+
+.modal-header {
+	background-color: #f0b000;
+	color: white !important;
+	text-align: center;
+	font-size: 30px;
+	padding: 35px 50px;
+}
+
+.modal-title {
+	font-size: 28px;
+}
+
+.modal-lg {
+	width: 85%;
+}
+
+.modal-md {
+	width: 70%;
+}
+
+.modal-footer {
+	background-color: #f9f9f9;
+}
+
+.modal-footer, .modal-header {
+	border-radius: 5px;
 }
