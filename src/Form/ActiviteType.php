@@ -23,7 +23,7 @@ class ActiviteType extends AbstractType
             ->add('date', DateType::class, array(
                 'widget' => 'single_text',
                 'html5' => false,
-                'format' => 'dd/mm/yyyy',
+                'format' => 'dd/MM/yyyy',
                 'attr' => ['class' => 'js-datepicker', 'placeholder' => 'Date', ]
             ))
             ->add('temps', NumberType::class, array(
