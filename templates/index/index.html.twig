@@ -35,11 +35,11 @@
     {{ form_start(form, {'attr': {'class': 'activite-wrapper'}}) }}
     {{ form_errors(form) }}
         {{ form_widget(form.date, {'attr': {'class': 'tabable'}}) }}
-        {{ form_widget(form.temps, {'attr': {'class': 'tabable'}}) }}
+        <input type="number" id="activite_temps" name="activite[temps]" required="required" placeholder="Heure de travail" min="0" max="10000" step="0.25" class="tabable form-control">
         {{ form_widget(form.site, {'attr': {'class': 'tabable'}}) }}
-        {{ form_widget(form.tache, {'attr': {'class': 'tabable js-data-ajax'}}) }}
-        {{ form_widget(form.utilisateur, {'attr': {'class': 'tabable'}}) }}
         {{ form_widget(form.projet, {'attr': {'class': 'tabable'}}) }}
+        <select id="activite_tache" name="activite[tache]" class="tabable js-data-ajax form-control"></select>
+        {{ form_widget(form.utilisateur, {'attr': {'class': 'tabable'}}) }}
     {{ form_row(form._token) }}
     {{ form_end(form, {'render_rest' : false}) }}
     <button id='add-activite' class='button pull-right tabable'><i class="fas fa-plus"></i> Ajouter une activité</button>
@@ -61,6 +61,7 @@
     <a class='button' href={{path('export')}}><i class="fas fa-file-download"></i>  Exporter</a>
 
 {% endblock %}
+
 {% block javascripts %}
 <script>
     var user = '{{ app.user.id}}';
@@ -68,16 +69,23 @@
 
     /* Date
     ================= */
-    $('#datedebut, #datefin, #activite_date').datepicker({language: 'fr', format: 'dd/mm/yyyy', todayBtn: true, todayHighlight: true, autoclose: true});
+    $('#datedebut, #datefin, #activite_date').datepicker({language: 'fr', format: 'dd/mm/yyyy', forceParse: true, todayBtn: true, todayHighlight: true, autoclose: true});
 
     var now = new Date();
-    $('#datedebut').val(createDate(now.getDate(), now.getMonth() + 1, now.getFullYear()));
+    $('#datedebut').val(createDate(01, now.getMonth() + 1, now.getFullYear()));
     now.setMonth(now.getMonth() + 1);
-    $('#datefin').val(createDate(now.getDate(), now.getMonth() + 1, now.getFullYear()));
+    $('#datefin').val(createDate(01, now.getMonth() + 1, now.getFullYear()));
 
     $('#datedebut, #datefin, #activite_date').on('change', function() {
         let date = $(this).val();
         let res = date.split("/");
+        /*
+        if (res[2] == undefined) {
+            res[2] = now.getFullYear() - 1;
+            res[2] = res[2].toString()
+            $(this).val(createDate(res[0], res[1], res[2]));
+        }
+        */
         if (res[2] && res[2].length != 4) {
             res[2] = parseInt(res[2]) + 2000; 
             date = createDate(res[0], res[1], res[2]);
@@ -93,28 +101,31 @@
 
     /* Select2 
     ================= */
-    let projet= [];
-    $('#projet').on('select2:select', function (e) {
-        $.each($(this).select2('data'), function(i){
+    function loadProjet() {
+        let projet = [];
+        $.each($('#projet').select2('data'), function(i){
             projet[i] = $(this)[0].text;
         })
-      });
+        return projet;
+    }
 
-    let utilisateur= [];
-    $('#utilisateur').on('select2:select', function (e) {
-        $.each($(this).select2('data'), function(i){
+    function loadUtilisateur() {
+        let utilisateur = [];
+        $.each($('#utilisateur').select2('data'), function(i){
             utilisateur[i] = $(this)[0].text;
         })
-    });
+        return utilisateur;
+    }
 
-    let site= [];
-    $('#site').on('select2:select', function (e) {
-        $.each($(this).select2('data'), function(i){
+    function loadSite() {
+        let site = [];
+        $.each($('#site').select2('data'), function(i){
             site[i] = $(this)[0].text;
-        })
-      });
+        });
+        return site;
+    }
     
-      let start = 0;
+    var start = 0;
 
     $('#site').select2({placeholder: 'Site'});
     $('#utilisateur').select2({placeholder: 'Utilisateur'});
@@ -123,6 +134,15 @@
     $('#activite_projet').select2({placeholder: 'Projet'}).on('select2:open', function (e) {setCurIndex($(this));});
     $('#activite_utilisateur').select2({placeholder: 'Utilisateur'}).on('select2:open', function (e) {setCurIndex($(this));});
 
+    if ({{ f_datedebut|json_encode|raw }} != null && {{f_datefin|json_encode|raw }} != null) {
+        $("#datedebut").val({{ f_datedebut|json_encode|raw }});
+        $("#datefin").val({{f_datefin|json_encode|raw }});
+    }
+    $('#utilisateur').val({{ f_utilisateur|json_encode|raw }});
+    $('#site').val({{ f_site|json_encode|raw }});
+    $('#projet').val({{ f_projet|json_encode|raw }});
+    $('#projet, #site, #utilisateur').trigger('change');
+
     var grid = $("#grid-data").bootgrid({
         rowCount: [
                 -1, 10, 25, 50
@@ -130,9 +150,9 @@
         ajax: true,
         requestHandler: function (request) {
             request.start = start;
-            request.site = site;
-            request.projet = projet;
-            request.utilisateur = utilisateur;
+            request.site = loadSite();
+            request.projet = loadProjet();
+            request.utilisateur = loadUtilisateur();
             request.datedebut = $('#datedebut').val();
             request.datefin = $('#datefin').val();
             return request;
@@ -148,10 +168,10 @@
             let total = 0;
             $('#grid-data > tbody > tr').each(function(i) {
                 if ($(this).find('td:eq(2)').text() > 0) {
-                    total += parseInt($(this).find('td:eq(2)').text());
+                    total += parseFloat($(this).find('td:eq(2)').text());
                 }
             });
-            $("#grid-data tbody").append('<tr><td>Total</td><td></td><td>' + total + '</td><td></td><td></td><td></td><td></td></tr>')
+            $("#grid-data tbody").append('<tr><td>Total</td><td></td><td>' + total.toFixed(2) + '</td><td></td><td></td><td></td><td></td></tr>')
             grid.find(".command-view").on("click", function (e) {
                 var url = "{{ path('activite_edit', {'id': 'edit_id'}) }}";
                 var id = $(this).attr("data-row-id");
@@ -161,8 +181,8 @@
     });
 
     $("#filter").on("click", function (e) {
-        start = 1;
         e.preventDefault();
+        start = 1;
         $("#grid-data").bootgrid('reload');
     });
 
@@ -199,7 +219,13 @@
 
     $('#add-activite').on('click', function(e) {
         e.preventDefault();
-        console.log($('#activite_tache').select2('data')[0].tache);
+        if (!$('#activite_tache').val() || !$('#activite_site').val() || !$('#activite_projet').val()) {
+            return;
+        }
+        let tache = $('#activite_tache').select2('data')[0].tache;
+        if (tache == undefined) {
+            tache = $('#activite_tache').val();
+        }
         $.ajax({
             url: "{{ path('activite_add') }}",
             type: "POST",
@@ -209,10 +235,13 @@
                 "temps": $('#activite_temps').val(),
                 "site": $('#activite_site').val(),
                 "projet": $('#activite_projet').val(),
-                "tache": $('#activite_tache').select2('data')[0].tache,
+                "tache": tache,
                 "utilisateur": $('#activite_utilisateur').val(),
             },
             success: function (resp) {
+                $("form[name='activite'] input").val('');
+                $('#activite_site, #activite_tache, #activite_projet').val(null).trigger('change');
+                $('#activite_utilisateur option[value=' + user +']').prop('selected', true);
                 $("#grid-data").bootgrid('reload');
             }
         });

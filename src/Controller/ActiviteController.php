@@ -100,7 +100,7 @@ class ActiviteController extends AbstractController
         if ($request->isXmlHttpRequest()) {
             $date = $request->request->get('date');
             $temps = $request->request->get('temps');
-            $temps = (intval($temps) < 0 || $temps == "") ? 0 : $temps;
+            $temps = (floatval($temps) < 0 || $temps == "") ? 0 : $temps;
             $site = $request->request->get('site');
             $projet = $request->request->get('projet');
             $tache = $request->request->get('tache');
@@ -113,7 +113,7 @@ class ActiviteController extends AbstractController
             if ($date != "" && $site != "" && $projet != "" && $tache != "") {
                 $activite = new Activite();
                 $activite->setDate(\DateTime::createFromFormat("d/m/Y H:i:s", $date . " 00:00:00"));
-                $activite->setTemps(intval($temps));
+                $activite->setTemps(floatval($temps));
                 $activite->setSite($em->getRepository(Site::class)->findOneBy(['id' => $site]));
                 $activite->setProjet($em->getRepository(Projet::class)->findOneBy(['id' => $projet]));
                 $activite->setTache($tache);

@@ -24,11 +24,11 @@ class Activite
     private $date;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="float")
      * @Groups({"activite"})
      */
     private $temps;
-    
+
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"activite"})
@@ -55,67 +55,65 @@ class Activite
      */
     private $site;
 
-    public function getId(): ?int
+    public function getId() : ? int
     {
         return $this->id;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate() : ? \DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate(\DateTimeInterface $date) : self
     {
         $this->date = $date;
 
         return $this;
     }
 
-    public function getTemps(): ?int
+    public function getTemps() : ? float
     {
         return $this->temps;
     }
 
-    public function setTemps(int $temps): self
+    public function setTemps(float $temps) : self
     {
         $this->temps = $temps;
 
         return $this;
     }
 
-   
-
-    public function getTache(): ?string
+    public function getTache() : ? string
     {
         return $this->tache;
     }
 
-    public function setTache(string $tache): self
+    public function setTache(string $tache) : self
     {
         $this->tache = $tache;
 
         return $this;
     }
 
-    public function getUtilisateur(): ?Utilisateur
+    public function getUtilisateur() : ? Utilisateur
     {
         return $this->utilisateur;
     }
 
-    public function setUtilisateur(?Utilisateur $utilisateur): self
+    public function setUtilisateur(? Utilisateur $utilisateur) : self
     {
         $this->utilisateur = $utilisateur;
 
         return $this;
     }
 
-    public function getProjet(): ?Projet
+    public function getProjet() : ? Projet
     {
         return $this->projet;
     }
 
-    public function setProjet(?Projet $projet): self
+    public function setProjet(? Projet $projet) : self
     {
         $this->projet = $projet;
 
@@ -127,12 +125,12 @@ class Activite
         return $this->tache;
     }
 
-    public function getSite(): ?Site
+    public function getSite() : ? Site
     {
         return $this->site;
     }
 
-    public function setSite(?Site $site): self
+    public function setSite(? Site $site) : self
     {
         $this->site = $site;
 

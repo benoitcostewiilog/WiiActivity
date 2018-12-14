@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ActiviteRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,8 +39,7 @@ class IndexController extends AbstractController
             $activite = new Activite;
             $activite->setdate(new \DateTime('2018-01-01T15:03:01.012345Z'));
             $activite->setTemps(3);
-            dump("helle");
-            dump($this->getDoctrine()->getRepository(Site::class)->findOneBy(["id" => 1]));
+
             $activite->setSite($this->getDoctrine()->getRepository(Site::class)->findOneBy(["id" => 1]));
             $activite->setProjet($this->getDoctrine()->getRepository(Projet::class)->findOneBy(["id" => 3]));
             $activite->setUtilisateur($this->getDoctrine()->getRepository(Utilisateur::class)->findOneBy(["id" => 1]));
@@ -72,15 +72,28 @@ class IndexController extends AbstractController
     {
         $activite = new Activite();
         $form = $this->createForm(ActiviteType::class, $activite);
+        $session = $request->getSession();
 
         if ($request->isXmlHttpRequest()) {
-            $utilisateur = $request->request->get('utilisateur');
-            $site = $request->request->get('site');
-            $projet = $request->request->get('projet');
 
-            $datedebut = $request->request->get('datedebut');
-            $datefin = $request->request->get('datefin');
-
+            if (!$request->request->get('start')) {
+                $utilisateur = $session->get('utilisateur');
+                $site = $session->get('site');
+                $projet = $session->get('projet');
+                $datedebut = $session->get('datedebut');
+                $datefin = $session->get('datefin');
+            } else {
+                $utilisateur = $request->request->get('utilisateur');
+                $site = $request->request->get('site');
+                $projet = $request->request->get('projet');
+                $datedebut = $request->request->get('datedebut');
+                $datefin = $request->request->get('datefin');
+                $session->set('utilisateur', $request->request->get('utilisateur'));
+                $session->set('site', $request->request->get('site'));
+                $session->set('projet', $request->request->get('projet'));
+                $session->set('datedebut', $request->request->get('datedebut'));
+                $session->set('datefin', $request->request->get('datefin'));
+            }
 
             $current = $request->request->get('current');
             $rowCount = $request->request->get('rowCount');
@@ -142,6 +155,11 @@ class IndexController extends AbstractController
             'projets' => $projets,
             'utilisateurs' => $utilisateurs,
             'form' => $form->createView(),
+            "f_utilisateur" => $statut = $session->get('utilisateur'),
+            "f_site" => $statut = $session->get('site'),
+            "f_projet" => $statut = $session->get('projet'),
+            "f_datedebut" => $statut = $session->get('datedebut'),
+            "f_datefin" => $statut = $session->get('datefin'),
         ]);
     }
 
@@ -179,6 +197,16 @@ class IndexController extends AbstractController
         return $response;
     }
 
+    private function isAlreadySameTache($array, $tache)
+    {
+        foreach ($array as $a) {
+            if (strcmp($a['tache'], $tache) == 0) {
+                return (1);
+            }
+        }
+        return (0);
+    }
+
     /**
      * @Route("/tache", name="get_tache")
      */
@@ -193,7 +221,9 @@ class IndexController extends AbstractController
                     "id" => $activite->getId(),
                     "tache" => $activite->getTache(),
                 ];
-                array_push($rows, $row);
+                if ($this->isAlreadySameTache($rows, $activite->getTache()) == 0) {
+                    array_push($rows, $row);
+                }
             }
 
             $data = array(

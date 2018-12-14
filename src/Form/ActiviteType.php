@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Entity\Projet;
 use App\Entity\Site;
@@ -25,10 +26,12 @@ class ActiviteType extends AbstractType
                 'format' => 'dd/mm/yyyy',
                 'attr' => ['class' => 'js-datepicker', 'placeholder' => 'Date', ]
             ))
-            ->add('temps', IntegerType::class, array(
+            ->add('temps', NumberType::class, array(
                 'attr' => array(
                     'placeholder' => 'Heure de travail',
-                    'min' => 0, 'max' => 10000
+                    'min' => 0,
+                    'max' => 10000,
+                    'step' => 0.25,
                 ),
             ))
             ->add('site', EntityType::class, array(
@@ -40,10 +43,7 @@ class ActiviteType extends AbstractType
                     'placeholder' => 'Site/Client',
                 ),
             ))
-            ->add('tache', ChoiceType::class, array(
-                'choices' => array(
-                    '' => '',
-                ),
+            ->add('tache', TextType::class, array(
                 'attr' => array(
                     'placeholder' => 'Tâche',
                 ),
